@@ -11,7 +11,7 @@ For hosted demos, the recommended AI mode is Gemini Flash Lite through `GEMINI_A
 ## What It Does
 
 - Uploads PDF learning material and stores timestamped copies under `data/user_doc`.
-- Builds document chat context for uploaded PDFs.
+- Keeps one active PDF context for chat/search; uploading another PDF replaces the active context.
 - Answers questions from the current document context.
 - Summarizes raw study text into concise notes.
 - Generates short note-style summaries.
@@ -119,6 +119,8 @@ With `GEMINI_API_KEY` present, the backend uses Gemini for:
 - summarization
 - note generation
 - PDF-based search-style answers
+
+Current document behavior: one PDF is active at a time. Admin stats separate the active document, unique uploaded filenames, and total upload events so duplicate uploads do not look like multiple active contexts.
 
 Official references:
 

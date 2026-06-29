@@ -64,14 +64,15 @@ elif ai_status:
     st.sidebar.caption(f"Model: {ai_status['gemini_model']}")
 
 st.title("AugmentED Learning Assistant")
-st.caption("Upload PDFs, ask document questions, summarize text, and inspect demo stats.")
+st.caption("Upload one active PDF context, ask questions, summarize text, and inspect demo stats.")
 
 upload_tab, chat_tab, summarize_tab, notes_tab, search_tab, admin_tab = st.tabs(
     ["Upload", "Chat", "Summarize", "Notes", "Search", "Admin"]
 )
 
 with upload_tab:
-    st.subheader("Upload a PDF")
+    st.subheader("Upload Active PDF")
+    st.info("Only one PDF is active for chat/search at a time. Uploading another PDF replaces the active context.")
     uploaded_file = st.file_uploader("Choose a PDF", type=["pdf"])
     upload_note = st.text_input("Short label", value="demo upload")
     if st.button("Upload PDF", type="primary", disabled=uploaded_file is None):
@@ -98,6 +99,7 @@ with upload_tab:
 
 with chat_tab:
     st.subheader("Ask the Active Document")
+    st.caption("Answers use the most recently uploaded PDF.")
     query = st.text_area("Question", placeholder="What is this document about?")
     if st.button("Ask", type="primary", disabled=not query.strip()):
         with st.spinner("Reading the active PDF and preparing an answer..."):
@@ -122,6 +124,7 @@ with notes_tab:
 
 with search_tab:
     st.subheader("Semantic Passage Search")
+    st.caption("Search runs against the most recently uploaded PDF.")
     search_text = st.text_area("Search text", height=160)
     if st.button("Find Similar Passages", type="primary", disabled=not search_text.strip()):
         with st.spinner("Searching the active PDF..."):
@@ -135,7 +138,11 @@ with admin_tab:
         st.error(stats_error)
     elif stats:
         col1, col2, col3 = st.columns(3)
-        col1.metric("Uploaded PDFs", stats["uploaded_pdf_count"])
-        col2.metric("Storage Used", f"{stats['uploaded_pdf_storage_mb']} MB")
+        col1.metric("Active Document", stats["active_document_count"])
+        col2.metric("Unique Documents", stats["unique_uploaded_document_count"])
         col3.metric("AI Provider", stats["ai_provider"])
+        st.metric("Total Upload Events", stats["total_upload_events"])
+        active_document = stats.get("active_document")
+        if active_document:
+            st.write(f"Active file: {active_document['original_filename']}")
         st.json(stats)

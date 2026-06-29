@@ -68,6 +68,7 @@ async def up_and_down(text: str, file: UploadFile = File(...)):
         print(save_file_path)
         with open(save_file_path, "wb") as f:
             f.write(data)
+        functions.record_upload(file.filename, new_fileName, save_file_path)
         ai_status = "ready"
         ai_detail = "Document chat context prepared."
         if use_gemini():
