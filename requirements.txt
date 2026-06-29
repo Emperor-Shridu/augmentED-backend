@@ -1,0 +1,27 @@
+# Core web app
+fastapi
+uvicorn[standard]
+python-multipart
+cryptography>=3.1
+requests
+streamlit
+
+# Document parsing
+pypdf
+
+# RAG / LLM stack
+llama-index==0.9.9
+llama-cpp-python ; platform_system != "Windows"
+transformers
+sentence-transformers
+huggingface_hub
+rank-bm25
+milvus[client]
+tiktoken
+langchain
+
+# Optional GPU helper; often problematic on Windows builds
+bitsandbytes ; platform_system != "Windows"
+
+# Tooling
+isort
