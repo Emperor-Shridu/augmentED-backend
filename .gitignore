@@ -11,3 +11,5 @@ ngrok
 test.db
 aenv
 data/*
+.env
+.env.*
