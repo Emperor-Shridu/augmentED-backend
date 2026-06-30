@@ -62,8 +62,13 @@ def note_maker_summarize(text, n_paras: int = 2):
 
 # Search
 
-def search_passages(passage, top_k=3):
-    return model.search_for_paras(passage, top_k=top_k)
+def search_passages(passage, top_k=4):
+    if not document_chat_engine_cache:
+        return ["No document is currently active. Upload a PDF first."]
+    doc_chat_engine = document_chat_engine_cache[0]
+    response = doc_chat_engine.query(passage)
+    return [str(response)]
+
 
 def search_titles(query, top_k=5):
     return model.search_for_title(query, top_k=top_k)

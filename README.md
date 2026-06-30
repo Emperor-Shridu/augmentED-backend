@@ -167,11 +167,6 @@ The model and generated indexes are intentionally ignored by Git because they ar
 ## Resume Bullets
 
 - Built a FastAPI backend for an AI learning library that supports PDF upload, document-grounded question answering, text summarization, note generation, and semantic passage search.
-- Integrated a local RAG pipeline using LlamaIndex, Hugging Face embeddings, Milvus vector search, BM25 helpers, and a quantized Zephyr 7B model through llama.cpp.
-- Improved deployability of a local-first AI prototype by adding lightweight health routes and graceful unavailable-state handling for heavy model dependencies.
+- Integrated a local RAG pipeline with LlamaIndex, Hugging Face embeddings, Milvus vector search, BM25 retrieval helpers, and a quantized Zephyr 7B model through llama.cpp.
+- Improved prototype deployability by decoupling heavy AI model loading from server startup and adding health endpoints for hosted API verification.
 
-## Documentation
-
-- [STAR project write-up](docs/project_star.md)
-- [GitHub and hosting guide](docs/github_hosting_guide.md)
-- [Interview portfolio log](docs/interview_portfolio_log.md)

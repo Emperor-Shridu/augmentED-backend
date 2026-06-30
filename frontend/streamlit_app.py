@@ -62,13 +62,31 @@ if ai_status_error:
 elif ai_status:
     st.sidebar.caption(f"AI provider: {ai_status['provider']}")
     st.sidebar.caption(f"Model: {ai_status['gemini_model']}")
+    active_doc = ai_status.get("active_document")
+    if active_doc:
+        st.sidebar.caption(f"Active doc: {active_doc}")
+    else:
+        st.sidebar.caption("No active document")
 
 st.title("AugmentED Learning Assistant")
-st.caption("Upload one active PDF context, ask questions, summarize text, and inspect demo stats.")
+st.caption("Upload PDFs, chat with them, summarize text, and inspect demo stats.")
+
+tab_descriptions = {
+    "Upload": "Upload a PDF. Once uploaded, it becomes the **active document** for Chat, Search, and document-based AI features.",
+    "Chat": "Ask questions about the **active uploaded PDF**. Works with both Gemini (hosted) and local AI modes.",
+    "Summarize": "Paste any text and generate concise summary bullet points. Uses text input directly — no PDF required.",
+    "Notes": "Paste any text and generate clean revision notes with headings and bullet points. Uses text input directly — no PDF required.",
+    "Search": "Find semantically similar passages in the **active uploaded PDF**. Consistent across Gemini and local modes.",
+    "Admin": "View demo stats like uploaded PDF count, storage used, and AI provider configuration.",
+}
 
 upload_tab, chat_tab, summarize_tab, notes_tab, search_tab, admin_tab = st.tabs(
-    ["Upload", "Chat", "Summarize", "Notes", "Search", "Admin"]
+    list(tab_descriptions.keys())
 )
+
+for tab, desc in zip([upload_tab, chat_tab, summarize_tab, notes_tab, search_tab, admin_tab], tab_descriptions.values()):
+    with tab:
+        st.caption(desc)
 
 with upload_tab:
     st.subheader("Upload Active PDF")
@@ -133,16 +151,40 @@ with search_tab:
 
 with admin_tab:
     st.subheader("Demo Stats")
-    stats, stats_error = request_json("GET", "/admin/stats/")
-    if stats_error:
-        st.error(stats_error)
-    elif stats:
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Active Document", stats["active_document_count"])
-        col2.metric("Unique Documents", stats["unique_uploaded_document_count"])
-        col3.metric("AI Provider", stats["ai_provider"])
-        st.metric("Total Upload Events", stats["total_upload_events"])
-        active_document = stats.get("active_document")
-        if active_document:
-            st.write(f"Active file: {active_document['original_filename']}")
-        st.json(stats)
+
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        admin_password = st.text_input("Admin password", type="password")
+    with col2:
+        st.write("")
+        st.write("")
+        load_stats = st.button("Load Stats", type="primary", use_container_width=True)
+
+    if load_stats:
+        if not admin_password:
+            st.warning("Enter the admin password to view stats.")
+        else:
+            stats, stats_error = request_json("GET", "/admin/stats/", params={"password": admin_password})
+            if stats_error:
+                st.error(stats_error)
+            elif stats:
+                st.success("Stats loaded successfully")
+
+                metric_col1, metric_col2, metric_col3 = st.columns(3)
+                metric_col1.metric("Uploaded PDFs", stats["uploaded_pdf_count"], label_visibility="visible")
+                metric_col2.metric("Storage Used", f"{stats['uploaded_pdf_storage_mb']} MB", label_visibility="visible")
+                metric_col3.metric("AI Provider", stats["ai_provider"], label_visibility="visible")
+
+                with st.expander("Detailed Configuration", expanded=True):
+                    config_col1, config_col2 = st.columns(2)
+                    with config_col1:
+                        st.write(f"**Upload directory exists:** {stats['upload_directory_exists']}")
+                        st.write(f"**Model file present:** {stats['model_file_present']}")
+                        st.write(f"**Model filename:** {stats['model_filename'] if stats['model_file_present'] else 'Not found'}")
+                    with config_col2:
+                        st.write(f"**Gemini configured:** {stats['gemini_configured']}")
+                        st.write(f"**Gemini model:** {stats['gemini_model']}")
+                        st.write(f"**Vectorstore present:** {stats['vectorstore_directory_present']}")
+
+                with st.expander("Raw JSON Response"):
+                    st.json(stats)

@@ -33,6 +33,14 @@ def use_gemini() -> bool:
     return gemini_service.is_configured()
 
 
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+
+
+def require_admin(password: str):
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Invalid admin password")
+
+
 @router.get("/")
 async def root():
     return {"name": "AugmentED Backend", "status": "running"}
@@ -49,7 +57,8 @@ async def ai_status():
 
 
 @router.get("/admin/stats/")
-async def admin_stats():
+async def admin_stats(password: str = ""):
+    require_admin(password)
     return functions.get_admin_stats()
 
 
