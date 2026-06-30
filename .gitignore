@@ -13,3 +13,4 @@ aenv
 data/*
 .env
 .env.*
+docs/
