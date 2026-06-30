@@ -164,16 +164,20 @@ with admin_tab:
         if not admin_password:
             st.warning("Enter the admin password to view stats.")
         else:
-            stats, stats_error = request_json("GET", "/admin/stats/", params={"password": admin_password})
-            if stats_error:
-                st.error(stats_error)
-            elif stats:
-                st.success("Stats loaded successfully")
+                stats, stats_error = request_json("GET", "/admin/stats/", params={"password": admin_password})
+                if stats_error:
+                    st.error(stats_error)
+                elif stats:
+                    st.success("Stats loaded successfully")
 
-                metric_col1, metric_col2, metric_col3 = st.columns(3)
-                metric_col1.metric("Uploaded PDFs", stats["uploaded_pdf_count"], label_visibility="visible")
-                metric_col2.metric("Storage Used", f"{stats['uploaded_pdf_storage_mb']} MB", label_visibility="visible")
-                metric_col3.metric("AI Provider", stats["ai_provider"], label_visibility="visible")
+                    pdf_count = stats.get("uploaded_pdf_count", 0)
+                    storage_mb = stats.get("uploaded_pdf_storage_mb", 0.0)
+                    ai_provider = stats.get("ai_provider", "unknown")
+
+                    metric_col1, metric_col2, metric_col3 = st.columns(3)
+                    metric_col1.metric("Uploaded PDFs", pdf_count, label_visibility="visible")
+                    metric_col2.metric("Storage Used", f"{storage_mb} MB", label_visibility="visible")
+                    metric_col3.metric("AI Provider", ai_provider, label_visibility="visible")
 
                 with st.expander("Detailed Configuration", expanded=True):
                     config_col1, config_col2 = st.columns(2)
