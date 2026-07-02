@@ -51,6 +51,11 @@ async def health():
     return {"status": "ok"}
 
 
+@router.head("/health")
+async def health_head():
+    return {}
+
+
 @router.get("/ai/status/")
 async def ai_status():
     return gemini_service.status()
